@@ -47,6 +47,15 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Jobbly custom colors
+        jobbly: {
+          purple: "hsl(var(--jobbly-purple))",
+          "purple-light": "hsl(var(--jobbly-purple-light))",
+          "purple-dark": "hsl(var(--jobbly-purple-dark))",
+          dark: "hsl(var(--jobbly-dark))",
+          card: "hsl(var(--jobbly-card))",
+          border: "hsl(var(--jobbly-border))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

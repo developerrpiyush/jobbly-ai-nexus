@@ -2,41 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Jobbly Job Portal Design System - Dark theme with purple gradients */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark theme base colors */
+    --background: 220 13% 5%;
+    --foreground: 210 40% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 13% 10%;
+    --card-foreground: 210 40% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 13% 10%;
+    --popover-foreground: 210 40% 90%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Purple brand colors for job portal */
+    --primary: 258 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 258 100% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 210 40% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 13% 16%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 258 100% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 20%;
+    --input: 220 13% 16%;
+    --ring: 258 100% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Custom Jobbly colors */
+    --jobbly-purple: 258 100% 60%;
+    --jobbly-purple-light: 258 100% 70%;
+    --jobbly-purple-dark: 258 100% 50%;
+    --jobbly-dark: 220 13% 5%;
+    --jobbly-card: 220 13% 10%;
+    --jobbly-border: 220 13% 20%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--jobbly-purple)), hsl(var(--jobbly-purple-light)));
+    --gradient-hero: linear-gradient(135deg, hsl(220 13% 5%), hsl(258 30% 10%));
+    --gradient-card: linear-gradient(135deg, hsl(220 13% 8%), hsl(220 13% 12%));
+
+    /* Shadows */
+    --shadow-purple: 0 10px 40px -10px hsl(var(--jobbly-purple) / 0.4);
+    --shadow-glow: 0 0 30px hsl(var(--jobbly-purple) / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +123,133 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
+}
+
+@layer components {
+  /* Jobbly Card Effects */
+  .jobbly-card {
+    @apply bg-card border-border rounded-2xl transition-all duration-300;
+    background: var(--gradient-card);
+    border: 2px solid hsl(var(--jobbly-border));
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rotateX, 0deg)) rotateY(var(--rotateY, 0deg));
+  }
+
+  .jobbly-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                hsl(var(--jobbly-purple) / 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .jobbly-card:hover::before {
+    opacity: 1;
+  }
+
+  .jobbly-card:hover {
+    border-color: hsl(var(--jobbly-purple));
+    box-shadow: var(--shadow-purple);
+  }
+
+  /* Gradient Buttons */
+  .jobbly-btn-primary {
+    @apply text-primary-foreground font-semibold rounded-full transition-all duration-300;
+    background: var(--gradient-primary);
+  }
+
+  .jobbly-btn-primary:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Text Gradients */
+  .text-gradient-purple {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Section Separators */
+  .section-separator {
+    height: 1px;
+    background: linear-gradient(to right, transparent, hsl(var(--jobbly-purple)), transparent);
+    margin: 4rem auto;
+    max-width: 64rem;
+  }
+
+  /* Animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--jobbly-purple) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--jobbly-purple) / 0.8);
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 1);
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
