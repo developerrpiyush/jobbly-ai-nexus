@@ -14,7 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          cover_letter: string | null
+          created_at: string | null
+          id: string
+          job_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          cover_letter?: string | null
+          created_at?: string | null
+          id?: string
+          job_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          benefits: string | null
+          company: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          location: string | null
+          posted_by: string | null
+          requirements: string | null
+          salary_max: number | null
+          salary_min: number | null
+          title: string | null
+          type: string | null
+        }
+        Insert: {
+          benefits?: string | null
+          company?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          posted_by?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          title?: string | null
+          type?: string | null
+        }
+        Update: {
+          benefits?: string | null
+          company?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          posted_by?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          title?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
