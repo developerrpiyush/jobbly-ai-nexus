@@ -53,10 +53,10 @@ const Jobs = () => {
   });
 
   const formatSalary = (min?: number | null, max?: number | null) => {
-    if (!min && !max) return 'Salary not specified';
-    if (min && max) return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
-    if (min) return `From $${min.toLocaleString()}`;
-    if (max) return `Up to $${max.toLocaleString()}`;
+    if (!min && !max) return 'Salary not disclosed';
+    if (min && max) return `₹${(min/100000).toFixed(1)}-${(max/100000).toFixed(1)} LPA`;
+    if (min) return `₹${(min/100000).toFixed(1)}+ LPA`;
+    if (max) return `Up to ₹${(max/100000).toFixed(1)} LPA`;
     return 'Competitive salary';
   };
 

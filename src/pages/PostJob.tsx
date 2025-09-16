@@ -183,23 +183,23 @@ const PostJob = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="salary_min">Minimum Salary ($)</Label>
+                      <Label htmlFor="salary_min">Minimum Salary (₹ per annum)</Label>
                       <Input
                         id="salary_min"
                         name="salary_min"
                         type="number"
-                        placeholder="e.g. 80000"
+                        placeholder="e.g. 800000"
                         value={formData.salary_min}
                         onChange={handleInputChange}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="salary_max">Maximum Salary ($)</Label>
+                      <Label htmlFor="salary_max">Maximum Salary (₹ per annum)</Label>
                       <Input
                         id="salary_max"
                         name="salary_max"
                         type="number"
-                        placeholder="e.g. 120000"
+                        placeholder="e.g. 1200000"
                         value={formData.salary_max}
                         onChange={handleInputChange}
                       />
