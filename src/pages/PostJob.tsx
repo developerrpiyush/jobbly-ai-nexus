@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +100,37 @@ const PostJob = () => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Check if user has employer role
+  const [profile, setProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          setProfile(data);
+          setProfileLoading(false);
+        });
+    }
+  }, [user]);
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Only allow employers to post jobs
+  if (profile?.role !== 'employer') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

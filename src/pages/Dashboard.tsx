@@ -38,6 +38,12 @@ const Dashboard = () => {
 
       if (error && error.code !== 'PGRST116') throw error;
       setProfile(data);
+      
+      // Redirect employers to their dashboard
+      if (data?.role === 'employer') {
+        window.location.href = '/employer-dashboard';
+        return;
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }

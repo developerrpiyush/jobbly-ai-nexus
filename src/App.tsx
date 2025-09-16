@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
-import Login from "./pages/Login";
+import RoleBasedLogin from "./pages/RoleBasedLogin";
 import Signup from "./pages/Signup";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import PostJob from "./pages/PostJob";
 import EmployerDashboard from "./pages/EmployerDashboard";
 import AITools from "./pages/AITools";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<RoleBasedLogin />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
