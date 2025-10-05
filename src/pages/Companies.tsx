@@ -27,61 +27,40 @@ const Companies = () => {
 
   const fetchCompanies = async () => {
     try {
-      // Get unique companies from jobs table
+      // Get companies from the companies table
       const { data, error } = await supabase
-        .from('jobs')
-        .select('company, location')
-        .not('company', 'is', null);
+        .from('companies')
+        .select('*');
 
       if (error) throw error;
 
-      // Group by company and count jobs
-      const companyMap = new Map();
-      data?.forEach(job => {
-        const company = job.company;
-        if (company) {
-          if (companyMap.has(company)) {
-            companyMap.set(company, {
-              ...companyMap.get(company),
-              jobCount: companyMap.get(company).jobCount + 1
-            });
-          } else {
-            companyMap.set(company, {
-              name: company,
-              logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(company)}&background=6a0dad&color=fff&size=200`,
-              jobCount: 1,
-              location: job.location || 'Remote',
-              description: `Join ${company} and be part of an innovative team building the future.`,
-              size: Math.random() > 0.5 ? 'Mid-size (50-200 employees)' : 'Large (200+ employees)'
-            });
-          }
-        }
-      });
+      // Transform data to match our interface
+      const transformedData = data?.map(company => ({
+        name: company.name,
+        logo: company.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=6a0dad&color=fff&size=200`,
+        jobCount: 0, // Will be updated with actual count
+        location: company.location || 'India',
+        description: company.description || `Join ${company.name} and be part of an innovative team.`,
+        size: company.size || 'Growing Company'
+      })) || [];
 
-      // Add some sample companies if the list is empty
-      if (companyMap.size === 0) {
-        const sampleCompanies = [
-          { name: 'TechCorp Inc.', location: 'San Francisco, CA', jobCount: 5 },
-          { name: 'StartupXYZ', location: 'New York, NY', jobCount: 3 },
-          { name: 'WebSolutions LLC', location: 'Austin, TX', jobCount: 8 },
-          { name: 'DataFlow Systems', location: 'Seattle, WA', jobCount: 12 },
-          { name: 'CloudNine Technologies', location: 'Remote', jobCount: 6 },
-          { name: 'InnovateLab', location: 'Boston, MA', jobCount: 4 }
-        ];
+      // Get job counts for each company
+      const { data: jobsData } = await supabase
+        .from('jobs')
+        .select('company');
 
-        sampleCompanies.forEach(company => {
-          companyMap.set(company.name, {
-            name: company.name,
-            logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=6a0dad&color=fff&size=200`,
-            jobCount: company.jobCount,
-            location: company.location,
-            description: `Join ${company.name} and be part of an innovative team building the future.`,
-            size: Math.random() > 0.5 ? 'Mid-size (50-200 employees)' : 'Large (200+ employees)'
-          });
+      if (jobsData) {
+        const jobCounts = jobsData.reduce((acc: any, job) => {
+          acc[job.company || ''] = (acc[job.company || ''] || 0) + 1;
+          return acc;
+        }, {});
+
+        transformedData.forEach(company => {
+          company.jobCount = jobCounts[company.name] || 0;
         });
       }
 
-      setCompanies(Array.from(companyMap.values()));
+      setCompanies(transformedData);
     } catch (error) {
       console.error('Error fetching companies:', error);
     } finally {

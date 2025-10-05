@@ -12,9 +12,9 @@ const Header = () => {
   const navItems = [
     { name: 'Jobs', href: '/jobs' },
     { name: 'Companies', href: '/companies' },
-    { name: 'Career Resources', href: '#resources' },
+    { name: 'Career Resources', href: '/career-resources' },
     { name: 'AI Tools', href: '/ai-tools' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Pricing', href: '/pricing' },
   ];
 
   return (

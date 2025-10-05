@@ -61,13 +61,10 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button className="jobbly-btn-primary px-8 py-4 text-lg font-semibold">
-            Upload Resume
-          </Button>
-          <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-jobbly-border hover:border-jobbly-purple hover:bg-jobbly-purple/10">
-            Browse Companies
+        {/* CTA Button */}
+        <div className="flex justify-center mb-12">
+          <Button className="jobbly-btn-primary px-12 py-4 text-lg font-semibold" onClick={() => window.location.href = '/login'}>
+            Login / Sign Up
           </Button>
         </div>
 

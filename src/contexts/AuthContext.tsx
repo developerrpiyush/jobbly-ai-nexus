@@ -75,8 +75,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
 
-    // Create profile
+    // Create profile and role
     if (data.user) {
+      // Create profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
@@ -85,12 +86,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: email,
             full_name: fullName,
             username: email.split('@')[0],
-            role: role,
           },
         ]);
 
       if (profileError) {
         console.error('Error creating profile:', profileError);
+      }
+
+      // Create user role in separate table for security
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert([
+          {
+            user_id: data.user.id,
+            role: role,
+          },
+        ]);
+
+      if (roleError) {
+        console.error('Error creating role:', roleError);
       }
     }
 

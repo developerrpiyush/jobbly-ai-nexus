@@ -46,10 +46,47 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          industry: string | null
+          location: string | null
+          logo: string | null
+          name: string
+          size: string | null
+          website: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          logo?: string | null
+          name: string
+          size?: string | null
+          website?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          industry?: string | null
+          location?: string | null
+          logo?: string | null
+          name?: string
+          size?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           benefits: string | null
           company: string | null
+          company_id: string | null
           created_at: string | null
           description: string | null
           id: string
@@ -64,6 +101,7 @@ export type Database = {
         Insert: {
           benefits?: string | null
           company?: string | null
+          company_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -78,6 +116,7 @@ export type Database = {
         Update: {
           benefits?: string | null
           company?: string | null
+          company_id?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
@@ -88,6 +127,32 @@ export type Database = {
           salary_min?: number | null
           title?: string | null
           type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          id: string
+          subscribed_at: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          subscribed_at?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          subscribed_at?: string | null
         }
         Relationships: []
       }
@@ -118,15 +183,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "job_seeker" | "employer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -253,6 +345,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["job_seeker", "employer"],
+    },
   },
 } as const

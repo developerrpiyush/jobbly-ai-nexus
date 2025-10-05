@@ -7,11 +7,64 @@ import {
   Phone, 
   MapPin 
 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import jobblyLogo from '@/assets/jobbly-logo.png';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Footer = () => {
+  const { toast } = useToast();
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  
+  const handleNewsletterSubmit = async () => {
+    const emailInput = document.getElementById('newsletter-email') as HTMLInputElement;
+    const email = emailInput?.value;
+
+    if (!email || !email.includes('@')) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email }]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast({
+            title: "Already Subscribed",
+            description: "You're already subscribed to our newsletter!",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Successfully Subscribed!",
+          description: "Thank you for subscribing to our newsletter. Check your inbox for updates!",
+        });
+        emailInput.value = '';
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      toast({
+        title: "Subscription Failed",
+        description: "There was an error subscribing you to our newsletter. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
   const footerLinks = {
     'Job Seekers': [
       'Browse Jobs',
@@ -60,11 +113,29 @@ const Footer = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <Input 
+              id="newsletter-email"
+              type="email"
               placeholder="Enter your email"
               className="flex-1 py-3 bg-background border-jobbly-border focus:border-jobbly-purple"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleNewsletterSubmit();
+                }
+              }}
             />
-            <Button className="jobbly-btn-primary px-8 py-3">
-              Subscribe
+            <Button 
+              className="jobbly-btn-primary px-8 py-3" 
+              onClick={handleNewsletterSubmit}
+              disabled={isSubscribing}
+            >
+              {isSubscribing ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Subscribing...
+                </>
+              ) : (
+                'Subscribe'
+              )}
             </Button>
           </div>
         </div>
