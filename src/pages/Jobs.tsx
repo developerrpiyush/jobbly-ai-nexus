@@ -47,7 +47,7 @@ const Jobs = () => {
     const matchesLocation = !locationFilter || 
       job.location?.toLowerCase().includes(locationFilter.toLowerCase());
     
-    const matchesType = !typeFilter || job.type === typeFilter;
+    const matchesType = !typeFilter || typeFilter === 'all' || job.type === typeFilter;
 
     return matchesSearch && matchesLocation && matchesType;
   });
@@ -112,7 +112,7 @@ const Jobs = () => {
                 <SelectValue placeholder="Job Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="full-time">Full Time</SelectItem>
                 <SelectItem value="part-time">Part Time</SelectItem>
                 <SelectItem value="contract">Contract</SelectItem>
@@ -158,7 +158,7 @@ const Jobs = () => {
               onClick={() => {
                 setSearchTerm('');
                 setLocationFilter('');
-                setTypeFilter('');
+                setTypeFilter('all');
               }}
               className="mt-4"
               variant="outline"
