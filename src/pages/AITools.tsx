@@ -166,84 +166,53 @@ const AITools = () => {
   };
 
   const generateResume = async () => {
+    if (!resumeData.name || !resumeData.email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in at least your name and email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     
-    setTimeout(() => {
-      if (resumeData.name && resumeData.email) {
-        const resume = `
-═══════════════════════════════════════════════════
-                    ${resumeData.name.toUpperCase()}
-═══════════════════════════════════════════════════
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'resume',
+            data: resumeData
+          }),
+        }
+      );
 
-📧 ${resumeData.email} | 📱 ${resumeData.phone}
-${resumeData.location ? `📍 ${resumeData.location}` : ''}
-${resumeData.linkedin ? `🔗 ${resumeData.linkedin}` : ''}
-${resumeData.portfolio ? `🌐 ${resumeData.portfolio}` : ''}
-
-───────────────────────────────────────────────────
-                 PROFESSIONAL SUMMARY
-───────────────────────────────────────────────────
-${resumeData.summary || 'A dedicated professional seeking opportunities to leverage skills and experience.'}
-
-───────────────────────────────────────────────────
-                    EXPERIENCE
-───────────────────────────────────────────────────
-${resumeData.experiences.map(exp => exp.company ? `
-• ${exp.position} at ${exp.company}
-  Duration: ${exp.duration}
-  ${exp.responsibilities}
-` : '').join('\n')}
-
-───────────────────────────────────────────────────
-                    EDUCATION
-───────────────────────────────────────────────────
-${resumeData.educations.map(edu => edu.institution ? `
-• ${edu.degree} from ${edu.institution}
-  Year: ${edu.year} | Score: ${edu.score}
-` : '').join('\n')}
-
-───────────────────────────────────────────────────
-                      SKILLS
-───────────────────────────────────────────────────
-Technical Skills: ${resumeData.technicalSkills}
-Soft Skills: ${resumeData.softSkills}
-
-${resumeData.projects[0].name ? `───────────────────────────────────────────────────
-                     PROJECTS
-───────────────────────────────────────────────────
-${resumeData.projects.map(proj => proj.name ? `
-• ${proj.name}
-  ${proj.description}
-  Technologies: ${proj.technologies}
-` : '').join('\n')}` : ''}
-
-${resumeData.certifications ? `───────────────────────────────────────────────────
-                  CERTIFICATIONS
-───────────────────────────────────────────────────
-${resumeData.certifications}` : ''}
-
-${resumeData.languages ? `───────────────────────────────────────────────────
-                    LANGUAGES
-───────────────────────────────────────────────────
-${resumeData.languages}` : ''}
-
-═══════════════════════════════════════════════════
-      `;
-        
-        setGeneratedResume(resume);
-        toast({
-          title: "Resume Generated Successfully!",
-          description: "Your AI-powered resume is ready to download.",
-        });
-      } else {
-        toast({
-          title: "Missing Information",
-          description: "Please fill in at least your name and email.",
-          variant: "destructive",
-        });
+      if (!response.ok) {
+        throw new Error('Failed to generate resume');
       }
+
+      const { content } = await response.json();
+      setGeneratedResume(content);
+      
+      toast({
+        title: "Resume Generated Successfully!",
+        description: "Your AI-powered resume is ready to download.",
+      });
+    } catch (error) {
+      console.error('Error generating resume:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate resume. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const downloadResume = () => {
@@ -264,353 +233,259 @@ ${resumeData.languages}` : ''}
   };
 
   // Cover Letter Functions
-  const generateCoverLetter = () => {
+  const generateCoverLetter = async () => {
+    if (!coverLetterData.yourName || !coverLetterData.jobTitle || !coverLetterData.companyName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in your name, job title, and company name.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGeneratingCoverLetter(true);
     
-    setTimeout(() => {
-      const letter = `
-${coverLetterData.yourName}
-${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'cover_letter',
+            data: coverLetterData
+          }),
+        }
+      );
 
-${coverLetterData.hiringManager || 'Hiring Manager'}
-${coverLetterData.companyName}
+      if (!response.ok) {
+        throw new Error('Failed to generate cover letter');
+      }
 
-Dear ${coverLetterData.hiringManager || 'Hiring Manager'},
-
-I am writing to express my strong interest in the ${coverLetterData.jobTitle} position at ${coverLetterData.companyName}. With ${coverLetterData.yourExperience}, I am confident in my ability to contribute effectively to your team.
-
-${coverLetterData.whyInterested}
-
-Throughout my career, I have developed expertise in ${coverLetterData.keySkills}. I am particularly drawn to ${coverLetterData.companyName} because of its innovative approach and commitment to excellence in the industry.
-
-I am excited about the opportunity to bring my unique blend of skills and experience to your organization. I would welcome the chance to discuss how my background aligns with your needs.
-
-Thank you for considering my application. I look forward to the opportunity to speak with you soon.
-
-Sincerely,
-${coverLetterData.yourName}
-      `;
+      const { content } = await response.json();
+      setGeneratedCoverLetter(content);
       
-      setGeneratedCoverLetter(letter);
       toast({
         title: "Cover Letter Generated!",
         description: "Your personalized cover letter is ready.",
       });
+    } catch (error) {
+      console.error('Error generating cover letter:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate cover letter. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGeneratingCoverLetter(false);
-    }, 1500);
+    }
   };
 
   // Interview Prep Functions
-  const generateInterviewQuestions = () => {
+  const generateInterviewQuestions = async () => {
+    if (!interviewData.jobRole || !interviewData.industry) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in job role and industry.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGeneratingQuestions(true);
     
-    setTimeout(() => {
-      const questions = [
-        `Tell me about your experience in ${interviewData.jobRole}.`,
-        `What interests you most about ${interviewData.industry}?`,
-        `How do you handle challenging situations in your work?`,
-        `Describe a project where you demonstrated leadership.`,
-        `What are your greatest strengths as a ${interviewData.jobRole}?`,
-        `How do you stay updated with industry trends in ${interviewData.industry}?`,
-        `Tell me about a time you failed and what you learned from it.`,
-        `Where do you see yourself in 5 years?`,
-        `How do you prioritize tasks when working on multiple projects?`,
-        `What motivates you in your professional career?`,
-        `Describe your ideal work environment.`,
-        `How do you handle feedback and criticism?`,
-        `What unique skills do you bring to this ${interviewData.jobRole} position?`,
-        `Tell me about a time you had to work with a difficult team member.`,
-        `Why should we hire you for this position?`,
-      ];
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'interview',
+            data: interviewData
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to generate interview questions');
+      }
+
+      const { content } = await response.json();
+      const questions = content.split('\n').filter((q: string) => q.trim().match(/^\d+\.|^-|^•/));
       
       setInterviewQuestions(questions);
       toast({
         title: "Questions Generated!",
         description: `${questions.length} interview questions ready for practice.`,
       });
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate interview questions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGeneratingQuestions(false);
-    }, 1500);
+    }
   };
 
   // Salary Negotiation Functions
-  const generateNegotiationAdvice = () => {
+  const generateNegotiationAdvice = async () => {
+    if (!salaryData.desiredSalary || !salaryData.experience || !salaryData.skills) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in desired salary, experience, and skills.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGeneratingAdvice(true);
     
-    setTimeout(() => {
-      const advice = `
-🎯 SALARY NEGOTIATION STRATEGY
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'salary',
+            data: salaryData
+          }),
+        }
+      );
 
-Based on your profile:
-• Current Salary: ₹${salaryData.currentSalary ? `${(parseInt(salaryData.currentSalary)/100000).toFixed(1)} LPA` : 'Not specified'}
-• Desired Salary: ₹${salaryData.desiredSalary ? `${(parseInt(salaryData.desiredSalary)/100000).toFixed(1)} LPA` : 'Not specified'}
-• Experience: ${salaryData.experience}
-• Location: ${salaryData.location}
+      if (!response.ok) {
+        throw new Error('Failed to generate negotiation advice');
+      }
 
-📊 MARKET ANALYSIS:
-For your skill set (${salaryData.skills}) and experience level, the market range is typically competitive in ${salaryData.location}. Your desired salary appears reasonable for your profile.
-
-💡 NEGOTIATION TIPS:
-
-1. TIMING IS KEY
-   • Wait for the offer before discussing numbers
-   • Never reveal your current salary first
-   • Let them make the initial offer
-
-2. JUSTIFY YOUR VALUE
-   • Highlight your ${salaryData.skills} expertise
-   • Mention specific achievements and ROI
-   • Reference market data for your role
-
-3. NEGOTIATION TACTICS
-   • Ask for ${parseInt(salaryData.desiredSalary) * 1.15} initially
-   • Be prepared to justify with concrete examples
-   • Consider total compensation, not just salary
-
-4. BENEFITS TO NEGOTIATE
-   • Performance bonuses
-   • Stock options/ESOPs
-   • Remote work flexibility
-   • Professional development budget
-   • Health insurance coverage
-   • Signing bonus
-
-5. POWER PHRASES TO USE
-   • "Based on my research and experience..."
-   • "I'm looking for a package that reflects my value..."
-   • "Can we discuss the complete compensation structure?"
-   • "I'm flexible if we can discuss other benefits..."
-
-6. RED FLAGS TO AVOID
-   • Don't accept the first offer immediately
-   • Never lie about current or past compensation
-   • Don't compare yourself negatively to others
-   • Avoid discussing personal financial needs
-
-🎯 FINAL STRATEGY:
-Target range: ₹${salaryData.desiredSalary ? `${(parseInt(salaryData.desiredSalary) * 0.95)/100000}` : 'X'} - ${salaryData.desiredSalary ? `${(parseInt(salaryData.desiredSalary) * 1.15)/100000}` : 'Y'} LPA
-This gives you negotiation room while staying realistic.
-      `;
+      const { content } = await response.json();
+      setNegotiationAdvice(content);
       
-      setNegotiationAdvice(advice);
       toast({
         title: "Negotiation Strategy Ready!",
         description: "Your personalized salary negotiation guide is prepared.",
       });
+    } catch (error) {
+      console.error('Error generating advice:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate negotiation advice. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGeneratingAdvice(false);
-    }, 2000);
+    }
   };
 
   // Career Path Functions
-  const generateCareerPath = () => {
+  const generateCareerPath = async () => {
+    if (!careerData.currentRole || !careerData.yearsOfExperience) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in current role and years of experience.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGeneratingPath(true);
     
-    setTimeout(() => {
-      const path = `
-🚀 PERSONALIZED CAREER ROADMAP
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'career_path',
+            data: careerData
+          }),
+        }
+      );
 
-CURRENT POSITION:
-${careerData.currentRole} | ${careerData.yearsOfExperience} of experience
+      if (!response.ok) {
+        throw new Error('Failed to generate career path');
+      }
 
-SKILLS INVENTORY:
-${careerData.skills}
-
-INTERESTS:
-${careerData.interests}
-
-─────────────────────────────────────────
-
-📈 CAREER PROGRESSION PATH
-
-SHORT TERM (1-2 years):
-→ Senior ${careerData.currentRole}
-  • Master advanced concepts in your current domain
-  • Take on mentorship responsibilities
-  • Lead small to medium-sized projects
-  • Build expertise in: ${careerData.skills}
-
-MID TERM (3-5 years):
-→ Lead ${careerData.currentRole} / Team Lead
-  • Manage a team of 3-5 professionals
-  • Drive strategic initiatives
-  • Develop leadership and communication skills
-  • Expand into: Architecture, System Design
-
-→ Technical Architect
-  • Design large-scale systems
-  • Make high-level technical decisions
-  • Guide multiple teams on best practices
-
-LONG TERM (5-10 years):
-→ Engineering Manager / Director
-  • Oversee multiple teams
-  • Set technical vision and strategy
-  • Budget and resource management
-  • Stakeholder management
-
-→ VP of Engineering / CTO
-  • Company-wide technical leadership
-  • Business strategy involvement
-  • Build and scale engineering culture
-
-ALTERNATIVE PATHS:
-→ Freelance Consultant
-  • Build diverse portfolio
-  • Work with multiple clients
-  • Flexible lifestyle
-
-→ Entrepreneur / Startup Founder
-  • Launch your own venture
-  • Leverage ${careerData.interests}
-  • Build something innovative
-
-─────────────────────────────────────────
-
-🎯 RECOMMENDED ACTIONS:
-
-1. SKILL DEVELOPMENT
-   • Advanced certifications in ${careerData.skills}
-   • Leadership and management courses
-   • Public speaking and presentation skills
-
-2. NETWORKING
-   • Attend industry conferences
-   • Join professional communities
-   • Build your personal brand on LinkedIn
-
-3. EXPERIENCE BUILDING
-   • Take on stretch assignments
-   • Contribute to open source
-   • Write technical blogs or create content
-
-4. CONTINUOUS LEARNING
-   • Stay updated with industry trends
-   • Learn emerging technologies
-   • Read leadership and business books
-      `;
+      const { content } = await response.json();
+      setCareerPath(content);
       
-      setCareerPath(path);
       toast({
         title: "Career Path Generated!",
         description: "Your personalized roadmap is ready.",
       });
+    } catch (error) {
+      console.error('Error generating career path:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate career path. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGeneratingPath(false);
-    }, 2000);
+    }
   };
 
   // Skills Gap Functions
-  const analyzeSkillsGap = () => {
+  const analyzeSkillsGap = async () => {
+    if (!skillsGapData.currentSkills || !skillsGapData.targetRole) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in current skills and target role.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsAnalyzingSkills(true);
     
-    setTimeout(() => {
-      const currentSkillsArray = skillsGapData.currentSkills.split(',').map(s => s.trim());
+    try {
+      const response = await fetch(
+        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'skills_gap',
+            data: skillsGapData
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze skills gap');
+      }
+
+      const { content } = await response.json();
+      setSkillsGapAnalysis(content);
       
-      const analysis = `
-🎯 SKILLS GAP ANALYSIS
-
-TARGET ROLE: ${skillsGapData.targetRole}
-INDUSTRY: ${skillsGapData.industry}
-
-─────────────────────────────────────────
-
-✅ YOUR CURRENT SKILLS:
-${currentSkillsArray.map(skill => `• ${skill}`).join('\n')}
-
-─────────────────────────────────────────
-
-📊 SKILLS REQUIRED FOR ${skillsGapData.targetRole.toUpperCase()}:
-
-CORE TECHNICAL SKILLS (Must Have):
-• Advanced programming concepts
-• System design and architecture
-• Cloud platforms (AWS/Azure/GCP)
-• Database management (SQL & NoSQL)
-• Version control (Git)
-• CI/CD pipelines
-• Testing frameworks
-
-SECONDARY SKILLS (Good to Have):
-• Containerization (Docker, Kubernetes)
-• Microservices architecture
-• Security best practices
-• Performance optimization
-• API design and development
-
-SOFT SKILLS (Essential):
-• Communication and presentation
-• Team collaboration
-• Problem-solving
-• Time management
-• Leadership potential
-
-INDUSTRY-SPECIFIC (${skillsGapData.industry}):
-• Domain knowledge
-• Compliance and regulations
-• Industry tools and platforms
-• Business acumen
-
-─────────────────────────────────────────
-
-🎓 LEARNING ROADMAP:
-
-IMMEDIATE FOCUS (0-3 months):
-1. Fill critical gaps in core technical skills
-2. Complete relevant online courses
-3. Build portfolio projects demonstrating new skills
-4. Practice coding challenges daily
-
-SHORT TERM (3-6 months):
-1. Earn industry certifications
-2. Contribute to open-source projects
-3. Attend workshops and webinars
-4. Network with professionals in ${skillsGapData.industry}
-
-MEDIUM TERM (6-12 months):
-1. Take on real-world projects
-2. Build a comprehensive portfolio
-3. Seek mentorship in target role
-4. Apply for stretch positions
-
-─────────────────────────────────────────
-
-📚 RECOMMENDED RESOURCES:
-
-Online Platforms:
-• Coursera, Udemy, Pluralsight
-• LeetCode, HackerRank for practice
-• YouTube channels for tutorials
-• LinkedIn Learning
-
-Certifications:
-• AWS Certified Solutions Architect
-• Google Cloud Professional
-• Industry-specific certifications
-
-Books & Blogs:
-• Technical blogs in ${skillsGapData.industry}
-• System design interview books
-• Leadership and soft skills resources
-
-Communities:
-• Reddit r/cscareerquestions
-• Stack Overflow
-• Industry-specific forums
-• Local meetup groups
-
-─────────────────────────────────────────
-
-⏱️ ESTIMATED TIMELINE:
-With consistent effort (10-15 hours/week), you can bridge this gap in 6-12 months and be ready for ${skillsGapData.targetRole} positions.
-
-💪 Stay committed to continuous learning!
-      `;
-      
-      setSkillsGapAnalysis(analysis);
       toast({
         title: "Analysis Complete!",
-        description: "Your personalized skills gap analysis is ready.",
+        description: "Your skills gap analysis is ready.",
       });
+    } catch (error) {
+      console.error('Error analyzing skills gap:', error);
+      toast({
+        title: "Analysis Failed",
+        description: "Failed to analyze skills gap. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzingSkills(false);
-    }, 2000);
+    }
   };
 
   return (
