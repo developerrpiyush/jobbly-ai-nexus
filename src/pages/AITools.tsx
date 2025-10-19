@@ -5,9 +5,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bot, FileText, Download, Sparkles, Plus, Trash2, Loader2, MessageSquare, Briefcase, TrendingUp, GraduationCap, Lightbulb } from 'lucide-react';
+import { Bot, FileText, Download, Sparkles, Plus, Trash2, Loader2, MessageSquare, Briefcase, TrendingUp, GraduationCap, Lightbulb, FileDown } from 'lucide-react';
 import Header from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
+import { jsPDF } from 'jspdf';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, UnderlineType } from 'docx';
+import { saveAs } from 'file-saver';
 
 interface Experience {
   company: string;
@@ -215,20 +218,392 @@ const AITools = () => {
     }
   };
 
-  const downloadResume = () => {
-    const blob = new Blob([generatedResume], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${resumeData.name.replace(/\s+/g, '_')}_Resume.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const downloadResumeAsPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const lineHeight = 7;
+    let yPosition = 20;
+
+    // Helper to add text with wrapping
+    const addWrappedText = (text: string, fontSize: number, isBold: boolean = false, align: 'left' | 'center' = 'left') => {
+      doc.setFontSize(fontSize);
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      
+      if (align === 'center') {
+        doc.text(text, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += lineHeight;
+      } else {
+        const lines = doc.splitTextToSize(text, pageWidth - 2 * margin);
+        lines.forEach((line: string) => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          doc.text(line, margin, yPosition);
+          yPosition += lineHeight;
+        });
+      }
+    };
+
+    // Name (Title)
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text(resumeData.name.toUpperCase(), pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 10;
+
+    // Contact Info
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const contactInfo = `${resumeData.email} | ${resumeData.phone}${resumeData.location ? ' | ' + resumeData.location : ''}`;
+    doc.text(contactInfo, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 5;
+    if (resumeData.linkedin || resumeData.portfolio) {
+      const links = [resumeData.linkedin, resumeData.portfolio].filter(Boolean).join(' | ');
+      doc.text(links, pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
+    } else {
+      yPosition += 5;
+    }
+
+    // Professional Summary
+    if (resumeData.summary) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PROFESSIONAL SUMMARY', margin, yPosition);
+      yPosition += 7;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      addWrappedText(resumeData.summary, 10);
+      yPosition += 5;
+    }
+
+    // Experience
+    if (resumeData.experiences.some(exp => exp.company)) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('EXPERIENCE', margin, yPosition);
+      yPosition += 7;
+
+      resumeData.experiences.forEach(exp => {
+        if (exp.company) {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${exp.position}`, margin, yPosition);
+          doc.setFont('helvetica', 'normal');
+          doc.text(`${exp.company}`, margin + 100, yPosition);
+          yPosition += 6;
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'italic');
+          doc.text(exp.duration, margin, yPosition);
+          yPosition += 5;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          addWrappedText(exp.responsibilities, 10);
+          yPosition += 3;
+        }
+      });
+    }
+
+    // Education
+    if (resumeData.educations.some(edu => edu.institution)) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('EDUCATION', margin, yPosition);
+      yPosition += 7;
+
+      resumeData.educations.forEach(edu => {
+        if (edu.institution) {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text(edu.degree, margin, yPosition);
+          yPosition += 6;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.text(`${edu.institution} | ${edu.year} | ${edu.score}`, margin, yPosition);
+          yPosition += 7;
+        }
+      });
+    }
+
+    // Skills
+    if (resumeData.technicalSkills || resumeData.softSkills) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SKILLS', margin, yPosition);
+      yPosition += 7;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      if (resumeData.technicalSkills) {
+        addWrappedText(`Technical: ${resumeData.technicalSkills}`, 10);
+      }
+      if (resumeData.softSkills) {
+        addWrappedText(`Soft Skills: ${resumeData.softSkills}`, 10);
+      }
+      yPosition += 3;
+    }
+
+    // Projects
+    if (resumeData.projects.some(proj => proj.name)) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PROJECTS', margin, yPosition);
+      yPosition += 7;
+
+      resumeData.projects.forEach(proj => {
+        if (proj.name) {
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text(proj.name, margin, yPosition);
+          yPosition += 6;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          addWrappedText(proj.description, 10);
+          doc.setFont('helvetica', 'italic');
+          addWrappedText(`Technologies: ${proj.technologies}`, 9);
+          yPosition += 3;
+        }
+      });
+    }
+
+    // Certifications
+    if (resumeData.certifications) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CERTIFICATIONS', margin, yPosition);
+      yPosition += 7;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      addWrappedText(resumeData.certifications, 10);
+    }
+
+    // Languages
+    if (resumeData.languages) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('LANGUAGES', margin, yPosition);
+      yPosition += 7;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      addWrappedText(resumeData.languages, 10);
+    }
+
+    doc.save(`${resumeData.name.replace(/\s+/g, '_')}_Resume.pdf`);
+    toast({
+      title: "PDF Downloaded",
+      description: "Your resume has been downloaded as PDF.",
+    });
+  };
+
+  const downloadResumeAsDOCX = async () => {
+    const children: any[] = [];
+
+    // Name (Title)
+    children.push(
+      new Paragraph({
+        text: resumeData.name.toUpperCase(),
+        heading: HeadingLevel.TITLE,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 },
+      })
+    );
+
+    // Contact Info
+    const contactParts = [resumeData.email, resumeData.phone, resumeData.location].filter(Boolean);
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: contactParts.join(' | '), size: 20 })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 100 },
+      })
+    );
+
+    if (resumeData.linkedin || resumeData.portfolio) {
+      const links = [resumeData.linkedin, resumeData.portfolio].filter(Boolean).join(' | ');
+      children.push(
+        new Paragraph({
+          children: [new TextRun({ text: links, size: 20 })],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
+        })
+      );
+    }
+
+    // Professional Summary
+    if (resumeData.summary) {
+      children.push(
+        new Paragraph({
+          text: 'PROFESSIONAL SUMMARY',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        }),
+        new Paragraph({
+          text: resumeData.summary,
+          spacing: { after: 200 },
+        })
+      );
+    }
+
+    // Experience
+    if (resumeData.experiences.some(exp => exp.company)) {
+      children.push(
+        new Paragraph({
+          text: 'EXPERIENCE',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        })
+      );
+
+      resumeData.experiences.forEach(exp => {
+        if (exp.company) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: exp.position, bold: true, size: 24 }),
+                new TextRun({ text: ` | ${exp.company}`, size: 24 }),
+              ],
+              spacing: { after: 50 },
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: exp.duration, italics: true, size: 20 })],
+              spacing: { after: 100 },
+            }),
+            new Paragraph({
+              text: exp.responsibilities,
+              spacing: { after: 200 },
+            })
+          );
+        }
+      });
+    }
+
+    // Education
+    if (resumeData.educations.some(edu => edu.institution)) {
+      children.push(
+        new Paragraph({
+          text: 'EDUCATION',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        })
+      );
+
+      resumeData.educations.forEach(edu => {
+        if (edu.institution) {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: edu.degree, bold: true, size: 24 })],
+              spacing: { after: 50 },
+            }),
+            new Paragraph({
+              text: `${edu.institution} | ${edu.year} | ${edu.score}`,
+              spacing: { after: 200 },
+            })
+          );
+        }
+      });
+    }
+
+    // Skills
+    if (resumeData.technicalSkills || resumeData.softSkills) {
+      children.push(
+        new Paragraph({
+          text: 'SKILLS',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        })
+      );
+      if (resumeData.technicalSkills) {
+        children.push(
+          new Paragraph({
+            text: `Technical: ${resumeData.technicalSkills}`,
+            spacing: { after: 100 },
+          })
+        );
+      }
+      if (resumeData.softSkills) {
+        children.push(
+          new Paragraph({
+            text: `Soft Skills: ${resumeData.softSkills}`,
+            spacing: { after: 200 },
+          })
+        );
+      }
+    }
+
+    // Projects
+    if (resumeData.projects.some(proj => proj.name)) {
+      children.push(
+        new Paragraph({
+          text: 'PROJECTS',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        })
+      );
+
+      resumeData.projects.forEach(proj => {
+        if (proj.name) {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: proj.name, bold: true, size: 24 })],
+              spacing: { after: 50 },
+            }),
+            new Paragraph({
+              text: proj.description,
+              spacing: { after: 50 },
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: `Technologies: ${proj.technologies}`, italics: true })],
+              spacing: { after: 200 },
+            })
+          );
+        }
+      });
+    }
+
+    // Certifications
+    if (resumeData.certifications) {
+      children.push(
+        new Paragraph({
+          text: 'CERTIFICATIONS',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        }),
+        new Paragraph({
+          text: resumeData.certifications,
+          spacing: { after: 200 },
+        })
+      );
+    }
+
+    // Languages
+    if (resumeData.languages) {
+      children.push(
+        new Paragraph({
+          text: 'LANGUAGES',
+          heading: HeadingLevel.HEADING_1,
+          spacing: { before: 200, after: 100 },
+        }),
+        new Paragraph({
+          text: resumeData.languages,
+        })
+      );
+    }
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: children,
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, `${resumeData.name.replace(/\s+/g, '_')}_Resume.docx`);
     
     toast({
-      title: "Download Started",
-      description: "Your resume is being downloaded.",
+      title: "DOCX Downloaded",
+      description: "Your resume has been downloaded as Word document.",
     });
   };
 
@@ -494,56 +869,72 @@ const AITools = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full mb-4">
-            <Bot className="w-8 h-8 text-white" />
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/60 rounded-2xl shadow-lg mb-6 animate-float">
+            <Bot className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            AI Career <span className="text-gradient-purple">Assistant</span>
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            AI Career Assistant
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Advanced AI tools to accelerate your career growth and job search success
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Powered by <span className="text-primary font-semibold">Gemini AI</span> - Advanced tools to accelerate your career growth and job search success
           </p>
+          <div className="mt-8 flex justify-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">AI-Powered</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+              <FileText className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Professional Templates</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+              <Download className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Export Ready</span>
+            </div>
+          </div>
         </div>
 
         <Tabs defaultValue="resume" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-8">
-            <TabsTrigger value="resume">
-              <FileText className="w-4 h-4 mr-2" />
-              Resume
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-12 h-auto p-2 bg-card/50 backdrop-blur-sm">
+            <TabsTrigger value="resume" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <FileText className="w-5 h-5" />
+              <span className="text-xs font-semibold">Resume</span>
             </TabsTrigger>
-            <TabsTrigger value="cover-letter">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Cover Letter
+            <TabsTrigger value="cover-letter" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <MessageSquare className="w-5 h-5" />
+              <span className="text-xs font-semibold">Cover Letter</span>
             </TabsTrigger>
-            <TabsTrigger value="interview">
-              <Briefcase className="w-4 h-4 mr-2" />
-              Interview
+            <TabsTrigger value="interview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <Briefcase className="w-5 h-5" />
+              <span className="text-xs font-semibold">Interview</span>
             </TabsTrigger>
-            <TabsTrigger value="salary">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Salary
+            <TabsTrigger value="salary" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <TrendingUp className="w-5 h-5" />
+              <span className="text-xs font-semibold">Salary</span>
             </TabsTrigger>
-            <TabsTrigger value="career">
-              <GraduationCap className="w-4 h-4 mr-2" />
-              Career Path
+            <TabsTrigger value="career" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <GraduationCap className="w-5 h-5" />
+              <span className="text-xs font-semibold">Career Path</span>
             </TabsTrigger>
-            <TabsTrigger value="skills">
-              <Lightbulb className="w-4 h-4 mr-2" />
-              Skills Gap
+            <TabsTrigger value="skills" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex-col gap-1 py-3">
+              <Lightbulb className="w-5 h-5" />
+              <span className="text-xs font-semibold">Skills Gap</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Resume Builder */}
-          <TabsContent value="resume">
+          <TabsContent value="resume" className="animate-fade-in">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="jobbly-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
+              <Card className="jobbly-card border-2 border-primary/10 shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-purple-500/5 border-b">
+                  <CardTitle className="flex items-center text-2xl">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                      <FileText className="w-5 h-5 text-primary" />
+                    </div>
                     Resume Information
                   </CardTitle>
-                  <CardDescription>Fill in your details to generate a professional resume</CardDescription>
+                  <CardDescription className="text-base">Fill in your details to generate a professional AI-powered resume</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6 max-h-[600px] overflow-y-auto">
                   {/* Personal Information */}
@@ -865,29 +1256,150 @@ const AITools = () => {
               </Card>
 
               {/* Resume Preview */}
-              <Card className="jobbly-card">
+              <Card className="jobbly-card sticky top-4">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <FileText className="w-5 h-5 mr-2" />
                     Resume Preview
                   </CardTitle>
-                  <CardDescription>Your AI-generated resume</CardDescription>
+                  <CardDescription>Your AI-generated professional resume</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {generatedResume ? (
-                    <>
-                      <pre className="whitespace-pre-wrap font-mono text-sm bg-secondary p-4 rounded-lg mb-4 max-h-[500px] overflow-y-auto">
-                        {generatedResume}
-                      </pre>
-                      <Button onClick={downloadResume} className="w-full jobbly-btn-primary">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download Resume
-                      </Button>
-                    </>
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-6 rounded-lg border-2 border-primary/10 shadow-sm max-h-[500px] overflow-y-auto">
+                        <div className="prose prose-sm max-w-none">
+                          <div className="text-center mb-6 pb-4 border-b-2 border-primary/20">
+                            <h1 className="text-2xl font-bold text-primary mb-2">{resumeData.name.toUpperCase()}</h1>
+                            <p className="text-sm text-muted-foreground">
+                              {resumeData.email} • {resumeData.phone}
+                              {resumeData.location && ` • ${resumeData.location}`}
+                            </p>
+                            {(resumeData.linkedin || resumeData.portfolio) && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {[resumeData.linkedin, resumeData.portfolio].filter(Boolean).join(' • ')}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {resumeData.summary && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                PROFESSIONAL SUMMARY
+                              </h2>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{resumeData.summary}</p>
+                            </div>
+                          )}
+
+                          {resumeData.experiences.some(exp => exp.company) && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                EXPERIENCE
+                              </h2>
+                              {resumeData.experiences.map((exp, idx) => exp.company && (
+                                <div key={idx} className="mb-3 pl-3 border-l-2 border-primary/30">
+                                  <h3 className="font-semibold text-foreground">{exp.position}</h3>
+                                  <p className="text-sm text-primary font-medium">{exp.company} • {exp.duration}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">{exp.responsibilities}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {resumeData.educations.some(edu => edu.institution) && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                EDUCATION
+                              </h2>
+                              {resumeData.educations.map((edu, idx) => edu.institution && (
+                                <div key={idx} className="mb-2 pl-3 border-l-2 border-primary/30">
+                                  <h3 className="font-semibold text-foreground">{edu.degree}</h3>
+                                  <p className="text-sm text-muted-foreground">{edu.institution} • {edu.year} • {edu.score}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {(resumeData.technicalSkills || resumeData.softSkills) && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                SKILLS
+                              </h2>
+                              {resumeData.technicalSkills && (
+                                <p className="text-sm mb-1">
+                                  <span className="font-semibold text-foreground">Technical:</span>
+                                  <span className="text-muted-foreground ml-2">{resumeData.technicalSkills}</span>
+                                </p>
+                              )}
+                              {resumeData.softSkills && (
+                                <p className="text-sm">
+                                  <span className="font-semibold text-foreground">Soft Skills:</span>
+                                  <span className="text-muted-foreground ml-2">{resumeData.softSkills}</span>
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {resumeData.projects.some(proj => proj.name) && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                PROJECTS
+                              </h2>
+                              {resumeData.projects.map((proj, idx) => proj.name && (
+                                <div key={idx} className="mb-3 pl-3 border-l-2 border-primary/30">
+                                  <h3 className="font-semibold text-foreground">{proj.name}</h3>
+                                  <p className="text-sm text-muted-foreground">{proj.description}</p>
+                                  <p className="text-xs text-primary font-medium mt-1">Technologies: {proj.technologies}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {resumeData.certifications && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                CERTIFICATIONS
+                              </h2>
+                              <p className="text-sm text-muted-foreground">{resumeData.certifications}</p>
+                            </div>
+                          )}
+
+                          {resumeData.languages && (
+                            <div className="mb-4">
+                              <h2 className="text-lg font-bold text-foreground mb-2 flex items-center">
+                                <span className="w-1 h-5 bg-primary mr-2"></span>
+                                LANGUAGES
+                              </h2>
+                              <p className="text-sm text-muted-foreground">{resumeData.languages}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button onClick={downloadResumeAsPDF} className="flex-1 jobbly-btn-primary">
+                          <FileDown className="w-4 h-4 mr-2" />
+                          Download PDF
+                        </Button>
+                        <Button onClick={downloadResumeAsDOCX} className="flex-1 jobbly-btn-primary" variant="outline">
+                          <FileDown className="w-4 h-4 mr-2" />
+                          Download DOCX
+                        </Button>
+                      </div>
+                    </div>
                   ) : (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Fill in your information and click "Generate Resume" to see your professional resume here.</p>
+                    <div className="text-center py-16 text-muted-foreground">
+                      <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-4">
+                        <FileText className="w-10 h-10 text-primary" />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">No Resume Generated Yet</h3>
+                      <p className="text-sm">Fill in your information and click "Generate Resume" to create your professional resume.</p>
                     </div>
                   )}
                 </CardContent>
