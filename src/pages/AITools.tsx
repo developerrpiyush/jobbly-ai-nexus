@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, UnderlineType } from 'docx';
 import { saveAs } from 'file-saver';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Experience {
   company: string;
@@ -181,26 +182,17 @@ const AITools = () => {
     setIsGenerating(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'resume',
-            data: resumeData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'resume',
+          data: resumeData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate resume');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      setGeneratedResume(content);
+      setGeneratedResume(data.content);
       
       toast({
         title: "Resume Generated Successfully!",
@@ -621,26 +613,17 @@ const AITools = () => {
     setIsGeneratingCoverLetter(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'cover_letter',
-            data: coverLetterData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'cover_letter',
+          data: coverLetterData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate cover letter');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      setGeneratedCoverLetter(content);
+      setGeneratedCoverLetter(data.content);
       
       toast({
         title: "Cover Letter Generated!",
@@ -672,26 +655,17 @@ const AITools = () => {
     setIsGeneratingQuestions(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'interview',
-            data: interviewData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'interview',
+          data: interviewData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate interview questions');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      const questions = content.split('\n').filter((q: string) => q.trim().match(/^\d+\.|^-|^•/));
+      const questions = data.content.split('\n').filter((q: string) => q.trim().match(/^\d+\.|^-|^•/));
       
       setInterviewQuestions(questions);
       toast({
@@ -724,26 +698,17 @@ const AITools = () => {
     setIsGeneratingAdvice(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'salary',
-            data: salaryData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'salary',
+          data: salaryData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate negotiation advice');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      setNegotiationAdvice(content);
+      setNegotiationAdvice(data.content);
       
       toast({
         title: "Negotiation Strategy Ready!",
@@ -775,26 +740,17 @@ const AITools = () => {
     setIsGeneratingPath(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'career_path',
-            data: careerData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'career_path',
+          data: careerData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate career path');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      setCareerPath(content);
+      setCareerPath(data.content);
       
       toast({
         title: "Career Path Generated!",
@@ -826,26 +782,17 @@ const AITools = () => {
     setIsAnalyzingSkills(true);
     
     try {
-      const response = await fetch(
-        `https://ffeqmosdqilspnfdndbe.supabase.co/functions/v1/generate-ai-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'skills_gap',
-            data: skillsGapData
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-ai-content', {
+        body: {
+          type: 'skills_gap',
+          data: skillsGapData
         }
-      );
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze skills gap');
-      }
+      if (error) throw error;
+      if (!data?.content) throw new Error('No content received');
 
-      const { content } = await response.json();
-      setSkillsGapAnalysis(content);
+      setSkillsGapAnalysis(data.content);
       
       toast({
         title: "Analysis Complete!",
