@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bot, FileText, Download, Sparkles, Plus, Trash2, Loader2, MessageSquare, Briefcase, TrendingUp, GraduationCap, Lightbulb, FileDown } from 'lucide-react';
 import Header from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
+import FormattedAIOutput from '@/components/FormattedAIOutput';
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, UnderlineType } from 'docx';
 import { saveAs } from 'file-saver';
@@ -90,7 +91,7 @@ const AITools = () => {
     experience: '',
     industry: '',
   });
-  const [interviewQuestions, setInterviewQuestions] = useState<string[]>([]);
+  const [interviewQuestions, setInterviewQuestions] = useState('');
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
 
   // Salary Negotiation State
@@ -665,12 +666,10 @@ const AITools = () => {
       if (error) throw error;
       if (!data?.content) throw new Error('No content received');
 
-      const questions = data.content.split('\n').filter((q: string) => q.trim().match(/^\d+\.|^-|^•/));
-      
-      setInterviewQuestions(questions);
+      setInterviewQuestions(data.content);
       toast({
         title: "Questions Generated!",
-        description: `${questions.length} interview questions ready for practice.`,
+        description: "Your interview questions are ready for practice.",
       });
     } catch (error: any) {
       console.error('Error generating questions:', error);
@@ -1448,9 +1447,9 @@ const AITools = () => {
                 </CardHeader>
                 <CardContent>
                   {generatedCoverLetter ? (
-                    <pre className="whitespace-pre-wrap text-sm bg-secondary p-4 rounded-lg max-h-[600px] overflow-y-auto">
-                      {generatedCoverLetter}
-                    </pre>
+                    <div className="bg-gradient-to-br from-secondary/30 to-primary/5 p-6 rounded-lg max-h-[600px] overflow-y-auto border border-primary/10">
+                      <FormattedAIOutput content={generatedCoverLetter} />
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -1520,15 +1519,9 @@ const AITools = () => {
                   <CardTitle>Practice Questions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {interviewQuestions.length > 0 ? (
-                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                      {interviewQuestions.map((question, index) => (
-                        <Card key={index} className="p-4 bg-secondary/50">
-                          <p className="text-sm">
-                            <strong>Q{index + 1}:</strong> {question}
-                          </p>
-                        </Card>
-                      ))}
+                  {interviewQuestions ? (
+                    <div className="bg-gradient-to-br from-secondary/30 to-primary/5 p-6 rounded-lg max-h-[600px] overflow-y-auto border border-primary/10">
+                      <FormattedAIOutput content={interviewQuestions} />
                     </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
@@ -1619,9 +1612,9 @@ const AITools = () => {
                 </CardHeader>
                 <CardContent>
                   {negotiationAdvice ? (
-                    <pre className="whitespace-pre-wrap text-sm bg-secondary p-4 rounded-lg max-h-[600px] overflow-y-auto">
-                      {negotiationAdvice}
-                    </pre>
+                    <div className="bg-gradient-to-br from-secondary/30 to-primary/5 p-6 rounded-lg max-h-[600px] overflow-y-auto border border-primary/10">
+                      <FormattedAIOutput content={negotiationAdvice} />
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -1702,9 +1695,9 @@ const AITools = () => {
                 </CardHeader>
                 <CardContent>
                   {careerPath ? (
-                    <pre className="whitespace-pre-wrap text-sm bg-secondary p-4 rounded-lg max-h-[600px] overflow-y-auto">
-                      {careerPath}
-                    </pre>
+                    <div className="bg-gradient-to-br from-secondary/30 to-primary/5 p-6 rounded-lg max-h-[600px] overflow-y-auto border border-primary/10">
+                      <FormattedAIOutput content={careerPath} />
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <GraduationCap className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -1776,9 +1769,9 @@ const AITools = () => {
                 </CardHeader>
                 <CardContent>
                   {skillsGapAnalysis ? (
-                    <pre className="whitespace-pre-wrap text-sm bg-secondary p-4 rounded-lg max-h-[600px] overflow-y-auto">
-                      {skillsGapAnalysis}
-                    </pre>
+                    <div className="bg-gradient-to-br from-secondary/30 to-primary/5 p-6 rounded-lg max-h-[600px] overflow-y-auto border border-primary/10">
+                      <FormattedAIOutput content={skillsGapAnalysis} />
+                    </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
