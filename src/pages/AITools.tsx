@@ -198,11 +198,11 @@ const AITools = () => {
         title: "Resume Generated Successfully!",
         description: "Your AI-powered resume is ready to download.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating resume:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate resume. Please try again.",
+        description: error?.message || "Failed to generate resume. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -629,11 +629,11 @@ const AITools = () => {
         title: "Cover Letter Generated!",
         description: "Your personalized cover letter is ready.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating cover letter:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate cover letter. Please try again.",
+        description: error?.message || "Failed to generate cover letter. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -672,11 +672,11 @@ const AITools = () => {
         title: "Questions Generated!",
         description: `${questions.length} interview questions ready for practice.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating questions:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate interview questions. Please try again.",
+        description: error?.message || "Failed to generate interview questions. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -714,11 +714,11 @@ const AITools = () => {
         title: "Negotiation Strategy Ready!",
         description: "Your personalized salary negotiation guide is prepared.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating advice:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate negotiation advice. Please try again.",
+        description: error?.message || "Failed to generate negotiation advice. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -756,11 +756,11 @@ const AITools = () => {
         title: "Career Path Generated!",
         description: "Your personalized roadmap is ready.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating career path:', error);
       toast({
         title: "Generation Failed",
-        description: "Failed to generate career path. Please try again.",
+        description: error?.message || "Failed to generate career path. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -798,11 +798,11 @@ const AITools = () => {
         title: "Analysis Complete!",
         description: "Your skills gap analysis is ready.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing skills gap:', error);
       toast({
         title: "Analysis Failed",
-        description: "Failed to analyze skills gap. Please try again.",
+        description: error?.message || "Failed to analyze skills gap. Please try again.",
         variant: "destructive",
       });
     } finally {

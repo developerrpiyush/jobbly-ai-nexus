@@ -15,15 +15,17 @@ serve(async (req) => {
     const { type, data } = await req.json();
     console.log('Generating AI content for type:', type);
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    if (!GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     let prompt = '';
+    let systemPrompt = 'You are a professional career advisor and content generator.';
 
     switch (type) {
       case 'resume':
+        systemPrompt = 'You are an expert resume writer with years of experience in crafting professional, ATS-friendly resumes.';
         prompt = `Generate a professional ATS-friendly resume in plain text format based on the following information:
 
 Name: ${data.name}
@@ -63,6 +65,7 @@ Please format this into a professional, well-structured resume with clear sectio
         break;
 
       case 'cover_letter':
+        systemPrompt = 'You are an expert at writing compelling cover letters that help candidates stand out.';
         prompt = `Write a professional cover letter for the following:
 
 Job Title: ${data.jobTitle}
@@ -77,6 +80,7 @@ Write a compelling cover letter that highlights the candidate's qualifications a
         break;
 
       case 'interview':
+        systemPrompt = 'You are an experienced technical interviewer and career coach.';
         prompt = `Generate 15 relevant interview questions for the following profile:
 
 Job Role: ${data.jobRole}
@@ -87,6 +91,7 @@ Provide a mix of technical, behavioral, and situational questions that would be 
         break;
 
       case 'salary':
+        systemPrompt = 'You are a salary negotiation expert with deep knowledge of compensation strategies.';
         prompt = `Provide detailed salary negotiation advice for:
 
 Current Salary: ${data.currentSalary}
@@ -107,6 +112,7 @@ Format the response with clear sections and actionable advice.`;
         break;
 
       case 'career_path':
+        systemPrompt = 'You are a career development specialist helping professionals plan their career trajectory.';
         prompt = `Create a detailed career roadmap for:
 
 Current Role: ${data.currentRole}
@@ -126,6 +132,7 @@ Make it personalized and actionable.`;
         break;
 
       case 'skills_gap':
+        systemPrompt = 'You are a skills assessment expert who helps identify learning opportunities.';
         prompt = `Analyze the skills gap for:
 
 Current Skills: ${data.currentSkills}
@@ -147,45 +154,41 @@ Be specific and actionable.`;
         throw new Error('Invalid type specified');
     }
 
-    console.log('Sending request to Gemini API...');
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 2048,
-          }
-        }),
-      }
-    );
+    console.log('Sending request to Lovable AI Gateway...');
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`Gemini API error: ${response.status}`);
+      console.error('Lovable AI Gateway error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+      if (response.status === 402) {
+        throw new Error('Payment required. Please add credits to your workspace.');
+      }
+      
+      throw new Error(`AI Gateway error: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log('Gemini API response received');
+    const generatedText = result.choices[0].message.content;
 
-    const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (!generatedText) {
-      console.error('No text in response:', JSON.stringify(result));
-      throw new Error('No content generated');
-    }
+    console.log('Successfully generated content');
 
     return new Response(
       JSON.stringify({ content: generatedText }),
