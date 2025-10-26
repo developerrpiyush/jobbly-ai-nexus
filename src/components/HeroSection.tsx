@@ -8,19 +8,23 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.append('search', searchTerm);
     if (location) params.append('location', location);
-    if (selectedType) params.append('type', selectedType);
+    if (selectedTypes.length > 0) params.append('types', selectedTypes.join(','));
     
     navigate(`/jobs?${params.toString()}`);
   };
 
   const handleTypeSelect = (type: string) => {
-    setSelectedType(selectedType === type ? '' : type);
+    setSelectedTypes(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
   };
 
   return (
@@ -84,7 +88,7 @@ const HeroSection = () => {
                 key={filter}
                 onClick={() => handleTypeSelect(filter)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
-                  selectedType === filter
+                  selectedTypes.includes(filter)
                     ? 'bg-jobbly-purple text-white'
                     : 'bg-secondary text-secondary-foreground hover:bg-jobbly-purple/20'
                 }`}

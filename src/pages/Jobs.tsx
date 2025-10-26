@@ -19,16 +19,17 @@ const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   useEffect(() => {
     // Read URL parameters and set initial state
     const search = searchParams.get('search');
     const location = searchParams.get('location');
-    const type = searchParams.get('type');
+    const types = searchParams.get('types');
     
     if (search) setSearchTerm(search);
     if (location) setLocationFilter(location);
-    if (type) setTypeFilter(type);
+    if (types) setSelectedTypes(types.split(','));
     
     fetchJobs();
   }, []);
@@ -57,7 +58,8 @@ const Jobs = () => {
     const matchesLocation = !locationFilter || 
       job.location?.toLowerCase().includes(locationFilter.toLowerCase());
     
-    const matchesType = !typeFilter || typeFilter === 'all' || job.type === typeFilter;
+    const matchesType = (!typeFilter || typeFilter === 'all' || job.type === typeFilter) &&
+      (selectedTypes.length === 0 || selectedTypes.includes(job.type || ''));
 
     return matchesSearch && matchesLocation && matchesType;
   });
