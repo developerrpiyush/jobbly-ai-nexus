@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search, MapPin, DollarSign, Clock, Building2, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import Header from '@/components/Header';
 type Job = Tables<'jobs'>;
 
 const Jobs = () => {
+  const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +21,15 @@ const Jobs = () => {
   const [typeFilter, setTypeFilter] = useState('');
 
   useEffect(() => {
+    // Read URL parameters and set initial state
+    const search = searchParams.get('search');
+    const location = searchParams.get('location');
+    const type = searchParams.get('type');
+    
+    if (search) setSearchTerm(search);
+    if (location) setLocationFilter(location);
+    if (type) setTypeFilter(type);
+    
     fetchJobs();
   }, []);
 

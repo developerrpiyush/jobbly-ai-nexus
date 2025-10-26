@@ -1,8 +1,28 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [location, setLocation] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('search', searchTerm);
+    if (location) params.append('location', location);
+    if (selectedType) params.append('type', selectedType);
+    
+    navigate(`/jobs?${params.toString()}`);
+  };
+
+  const handleTypeSelect = (type: string) => {
+    setSelectedType(selectedType === type ? '' : type);
+  };
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center px-4 overflow-hidden">
       {/* Background Elements */}
@@ -34,6 +54,9 @@ const HeroSection = () => {
               <Input 
                 placeholder="Job title, keywords, or company"
                 className="pl-12 py-6 text-lg bg-background border-jobbly-border focus:border-jobbly-purple"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="flex-1 relative">
@@ -41,21 +64,32 @@ const HeroSection = () => {
               <Input 
                 placeholder="Location or Remote"
                 className="pl-12 py-6 text-lg bg-background border-jobbly-border focus:border-jobbly-purple"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
-            <Button className="jobbly-btn-primary px-8 py-6 text-lg font-semibold">
+            <Button 
+              className="jobbly-btn-primary px-8 py-6 text-lg font-semibold"
+              onClick={handleSearch}
+            >
               Search Jobs
             </Button>
           </div>
           
           {/* Quick Filters */}
           <div className="flex flex-wrap gap-3 mt-6 justify-center">
-            {['Remote', 'Full-time', 'Part-time', 'Contract', 'Internship'].map((filter) => (
+            {['remote', 'full-time', 'part-time', 'contract', 'internship'].map((filter) => (
               <button
                 key={filter}
-                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-full text-sm font-medium hover:bg-jobbly-purple hover:text-white transition-colors duration-300"
+                onClick={() => handleTypeSelect(filter)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
+                  selectedType === filter
+                    ? 'bg-jobbly-purple text-white'
+                    : 'bg-secondary text-secondary-foreground hover:bg-jobbly-purple/20'
+                }`}
               >
-                {filter}
+                {filter.charAt(0).toUpperCase() + filter.slice(1)}
               </button>
             ))}
           </div>
