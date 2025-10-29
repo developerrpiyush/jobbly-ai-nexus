@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import FeaturesSection from '@/components/FeaturesSection';
@@ -8,6 +9,8 @@ import TestimonialSection from '@/components/TestimonialSection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     // Add 3D card tilt effects
     const cards = document.querySelectorAll('.jobbly-card');
@@ -100,10 +103,16 @@ const Index = () => {
                 that perfectly match your skills, experience, and career goals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="jobbly-btn-primary px-8 py-4 text-lg font-semibold rounded-full">
+                <button 
+                  className="jobbly-btn-primary px-8 py-4 text-lg font-semibold rounded-full"
+                  onClick={() => navigate('/signup')}
+                >
                   Get Started Free
                 </button>
-                <button className="bg-transparent border border-jobbly-border text-muted-foreground hover:border-jobbly-purple hover:text-foreground px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300">
+                <button 
+                  className="bg-transparent border border-jobbly-border text-muted-foreground hover:border-jobbly-purple hover:text-foreground px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300"
+                  onClick={() => navigate('/pricing')}
+                >
                   Schedule a Demo
                 </button>
               </div>

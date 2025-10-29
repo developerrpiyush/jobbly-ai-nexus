@@ -1,8 +1,11 @@
 import { ExternalLink, MapPin, Users, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const CompaniesSection = () => {
+  const navigate = useNavigate();
+  
   const companies = [
     {
       id: 1,
@@ -150,10 +153,17 @@ const CompaniesSection = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <Button className="jobbly-btn-primary flex-1">
+                <Button 
+                  className="jobbly-btn-primary flex-1"
+                  onClick={() => navigate(`/jobs?company=${encodeURIComponent(company.name)}`)}
+                >
                   View Jobs ({company.openJobs})
                 </Button>
-                <Button variant="outline" className="border-jobbly-border hover:border-jobbly-purple">
+                <Button 
+                  variant="outline" 
+                  className="border-jobbly-border hover:border-jobbly-purple"
+                  onClick={() => navigate('/companies')}
+                >
                   <ExternalLink size={16} />
                 </Button>
               </div>
@@ -185,7 +195,11 @@ const CompaniesSection = () => {
 
         {/* View All Companies CTA */}
         <div className="text-center">
-          <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-jobbly-border hover:border-jobbly-purple hover:bg-jobbly-purple/10">
+          <Button 
+            variant="outline" 
+            className="px-8 py-4 text-lg font-semibold border-jobbly-border hover:border-jobbly-purple hover:bg-jobbly-purple/10"
+            onClick={() => navigate('/companies')}
+          >
             Explore All Companies
           </Button>
         </div>

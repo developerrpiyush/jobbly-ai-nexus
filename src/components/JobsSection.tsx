@@ -1,8 +1,11 @@
 import { MapPin, DollarSign, Clock, Building, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const JobsSection = () => {
+  const navigate = useNavigate();
+  
   const featuredJobs = [
     {
       id: 1,
@@ -154,7 +157,10 @@ const JobsSection = () => {
               </div>
 
               {/* Apply Button */}
-              <Button className="w-full jobbly-btn-primary font-medium">
+              <Button 
+                className="w-full jobbly-btn-primary font-medium"
+                onClick={() => navigate(`/jobs/${job.id}`)}
+              >
                 Apply Now
               </Button>
             </div>
@@ -163,7 +169,11 @@ const JobsSection = () => {
 
         {/* View All Jobs CTA */}
         <div className="text-center">
-          <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-jobbly-border hover:border-jobbly-purple hover:bg-jobbly-purple/10">
+          <Button 
+            variant="outline" 
+            className="px-8 py-4 text-lg font-semibold border-jobbly-border hover:border-jobbly-purple hover:bg-jobbly-purple/10"
+            onClick={() => navigate('/jobs')}
+          >
             View All {featuredJobs.length * 50}+ Jobs
           </Button>
         </div>

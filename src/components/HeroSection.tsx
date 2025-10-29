@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Search, MapPin, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,7 +101,10 @@ const HeroSection = () => {
 
         {/* CTA Button */}
         <div className="flex justify-center mb-12">
-          <Button className="jobbly-btn-primary px-12 py-4 text-lg font-semibold" onClick={() => window.location.href = '/login'}>
+          <Button 
+            className="jobbly-btn-primary px-12 py-4 text-lg font-semibold" 
+            onClick={() => navigate('/login')}
+          >
             Login / Sign Up
           </Button>
         </div>
