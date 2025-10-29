@@ -8,6 +8,7 @@ import {
   MapPin 
 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import jobblyLogo from '@/assets/jobbly-logo.png';
@@ -16,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Footer = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSubscribing, setIsSubscribing] = useState(false);
   
   const handleNewsletterSubmit = async () => {
@@ -67,36 +69,36 @@ const Footer = () => {
   };
   const footerLinks = {
     'Job Seekers': [
-      'Browse Jobs',
-      'Career Advice',
-      'Resume Builder',
-      'Skill Tests',
-      'Interview Prep',
-      'Salary Guide'
+      { label: 'Browse Jobs', path: '/jobs' },
+      { label: 'Career Advice', path: '/career-resources' },
+      { label: 'Resume Builder', path: '/ai-tools' },
+      { label: 'Skill Tests', path: '/ai-tools' },
+      { label: 'Interview Prep', path: '/career-resources' },
+      { label: 'Salary Guide', path: '/career-resources' }
     ],
     'Employers': [
-      'Post a Job',
-      'Browse Candidates',
-      'Hiring Solutions',
-      'Company Reviews',
-      'Pricing',
-      'Success Stories'
+      { label: 'Post a Job', path: '/post-job' },
+      { label: 'Browse Candidates', path: '/jobs' },
+      { label: 'Hiring Solutions', path: '/pricing' },
+      { label: 'Company Reviews', path: '/companies' },
+      { label: 'Pricing', path: '/pricing' },
+      { label: 'Success Stories', path: '/blog' }
     ],
     'Resources': [
-      'Career Blog',
-      'Industry Reports',
-      'Webinars',
-      'Help Center',
-      'API Documentation',
-      'Mobile App'
+      { label: 'Career Blog', path: '/blog' },
+      { label: 'Industry Reports', path: '/blog' },
+      { label: 'Webinars', path: '/career-resources' },
+      { label: 'Help Center', path: '/help-center' },
+      { label: 'API Documentation', path: '/help-center' },
+      { label: 'Mobile App', path: '/help-center' }
     ],
     'Company': [
-      'About Us',
-      'Press',
-      'Careers',
-      'Contact',
-      'Privacy Policy',
-      'Terms of Service'
+      { label: 'About Us', path: '/about' },
+      { label: 'Press', path: '/blog' },
+      { label: 'Careers', path: '/jobs' },
+      { label: 'Contact', path: '/contact' },
+      { label: 'Privacy Policy', path: '/privacy-policy' },
+      { label: 'Terms of Service', path: '/terms-of-service' }
     ]
   };
 
@@ -181,14 +183,16 @@ const Footer = () => {
               {/* Social Links */}
               <div className="flex space-x-4">
                 {[
-                  { icon: Facebook, href: '#', label: 'Facebook' },
-                  { icon: Twitter, href: '#', label: 'Twitter' },
-                  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-                  { icon: Instagram, href: '#', label: 'Instagram' }
+                  { icon: Facebook, href: 'https://facebook.com/jobbly', label: 'Facebook' },
+                  { icon: Twitter, href: 'https://twitter.com/jobbly', label: 'Twitter' },
+                  { icon: Linkedin, href: 'https://linkedin.com/company/jobbly', label: 'LinkedIn' },
+                  { icon: Instagram, href: 'https://instagram.com/jobbly', label: 'Instagram' }
                 ].map((social) => (
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-muted-foreground hover:bg-jobbly-purple hover:text-white transition-colors duration-300"
                     aria-label={social.label}
                   >
@@ -204,13 +208,13 @@ const Footer = () => {
                 <h4 className="font-bold text-foreground mb-4">{category}</h4>
                 <ul className="space-y-3">
                   {links.map((link) => (
-                    <li key={link}>
-                      <a 
-                        href="#" 
-                        className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+                    <li key={link.label}>
+                      <button
+                        onClick={() => navigate(link.path)}
+                        className="text-muted-foreground hover:text-foreground transition-colors duration-300 text-left"
                       >
-                        {link}
-                      </a>
+                        {link.label}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -225,21 +229,33 @@ const Footer = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-muted-foreground mb-4 md:mb-0">
-              © 2024 Jobbly. All rights reserved.
+              © 2025 Jobbly. All rights reserved.
             </p>
             <div className="flex flex-wrap gap-6">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+              <button 
+                onClick={() => navigate('/privacy-policy')}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+              </button>
+              <button 
+                onClick={() => navigate('/terms-of-service')}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
                 Terms of Service
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+              </button>
+              <button 
+                onClick={() => navigate('/cookie-policy')}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
                 Cookie Policy
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors duration-300">
+              </button>
+              <button 
+                onClick={() => navigate('/accessibility')}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+              >
                 Accessibility
-              </a>
+              </button>
             </div>
           </div>
         </div>

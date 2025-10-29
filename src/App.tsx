@@ -16,6 +16,14 @@ import EmployerDashboard from "./pages/EmployerDashboard";
 import AITools from "./pages/AITools";
 import CareerResources from "./pages/CareerResources";
 import Pricing from "./pages/Pricing";
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import Accessibility from "./pages/Accessibility";
+import Blog from "./pages/Blog";
+import HelpCenter from "./pages/HelpCenter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +48,14 @@ const App = () => (
             <Route path="/ai-tools" element={<AITools />} />
             <Route path="/career-resources" element={<CareerResources />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
+            <Route path="/accessibility" element={<Accessibility />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/help-center" element={<HelpCenter />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
