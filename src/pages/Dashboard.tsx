@@ -13,18 +13,23 @@ import Header from '@/components/Header';
 type Application = Tables<'applications'> & {
   jobs: Tables<'jobs'> | null;
 };
+type SavedJob = Tables<'saved_jobs'> & {
+  jobs: Tables<'jobs'> | null;
+};
 type Profile = Tables<'profiles'>;
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
       fetchApplications();
+      fetchSavedJobs();
     }
   }, [user]);
 
@@ -66,6 +71,24 @@ const Dashboard = () => {
       console.error('Error fetching applications:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSavedJobs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('saved_jobs')
+        .select(`
+          *,
+          jobs (*)
+        `)
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedJobs(data || []);
+    } catch (error) {
+      console.error('Error fetching saved jobs:', error);
     }
   };
 
@@ -164,8 +187,9 @@ const Dashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="applications" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="applications">Applications</TabsTrigger>
+            <TabsTrigger value="saved">Saved Jobs</TabsTrigger>
             <TabsTrigger value="recommendations">Job Matches</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -213,6 +237,61 @@ const Dashboard = () => {
                           <Badge variant="outline">
                             Submitted
                           </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="saved" className="space-y-4">
+            <Card className="jobbly-card">
+              <CardHeader>
+                <CardTitle>Saved Jobs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="h-20 bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : savedJobs.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-lg text-muted-foreground mb-2">No saved jobs yet</p>
+                    <p className="text-sm text-muted-foreground">
+                      Save jobs to apply later
+                    </p>
+                    <Button className="mt-4 jobbly-btn-primary" onClick={() => window.location.href = '/jobs'}>
+                      Browse Jobs
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {savedJobs.map((savedJob) => (
+                      <div key={savedJob.id} className="border border-border rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-semibold text-lg">{savedJob.jobs?.title}</h3>
+                            <p className="text-muted-foreground">{savedJob.jobs?.company}</p>
+                            <div className="flex items-center mt-2 text-sm text-muted-foreground">
+                              <span>Saved {getTimeAgo(savedJob.created_at)}</span>
+                              <span className="mx-2">•</span>
+                              <span>{savedJob.jobs?.location}</span>
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={() => window.location.href = `/jobs/${savedJob.job_id}`}
+                            size="sm"
+                            className="jobbly-btn-primary"
+                          >
+                            View Job
+                          </Button>
                         </div>
                       </div>
                     ))}
