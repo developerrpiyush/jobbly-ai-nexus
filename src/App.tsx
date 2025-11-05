@@ -7,6 +7,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import RoleBasedLogin from "./pages/RoleBasedLogin";
 import Signup from "./pages/Signup";
+import JobSeekerLogin from "./pages/JobSeekerLogin";
+import JobSeekerSignup from "./pages/JobSeekerSignup";
+import EmployerLogin from "./pages/EmployerLogin";
+import EmployerSignup from "./pages/EmployerSignup";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import Companies from "./pages/Companies";
@@ -39,6 +43,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<RoleBasedLogin />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/job-seeker-login" element={<JobSeekerLogin />} />
+            <Route path="/job-seeker-signup" element={<JobSeekerSignup />} />
+            <Route path="/employer-login" element={<EmployerLogin />} />
+            <Route path="/employer-signup" element={<EmployerSignup />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetail />} />
             <Route path="/companies" element={<Companies />} />

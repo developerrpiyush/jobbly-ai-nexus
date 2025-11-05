@@ -68,12 +68,12 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login">
+                  <Link to="/job-seeker-login">
                     <Button variant="ghost" className="font-medium">
                       Login
                     </Button>
                   </Link>
-                  <Link to="/post-job">
+                  <Link to="/employer-login">
                     <Button className="jobbly-btn-primary px-6 py-2">
                       Post a Job
                     </Button>
@@ -132,12 +132,12 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to="/job-seeker-login" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="ghost" className="font-medium w-full">
                         Login
                       </Button>
                     </Link>
-                    <Link to="/post-job" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to="/employer-login" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button className="jobbly-btn-primary py-2 w-full">
                         Post a Job
                       </Button>

@@ -2,6 +2,12 @@ import { ExternalLink, MapPin, Users, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import googleLogo from '/logos/google.png';
+import microsoftLogo from '/logos/microsoft.png';
+import amazonLogo from '/logos/amazon.png';
+import metaLogo from '/logos/meta.png';
+import appleLogo from '/logos/apple.png';
+import netflixLogo from '/logos/netflix.png';
 
 const CompaniesSection = () => {
   const navigate = useNavigate();
@@ -9,75 +15,75 @@ const CompaniesSection = () => {
   const companies = [
     {
       id: 1,
-      name: 'TechFlow Inc.',
-      logo: 'https://placehold.co/80x80/6366f1/ffffff?text=TF',
+      name: 'Google',
+      logo: googleLogo,
       industry: 'Technology',
-      location: 'San Francisco, CA',
-      employees: '1,000-5,000',
-      rating: 4.8,
-      openJobs: 23,
-      description: 'Leading fintech company revolutionizing digital payments and blockchain solutions.',
-      benefits: ['Remote Work', 'Health Insurance', 'Stock Options', '401k Match']
+      location: 'Mountain View, CA',
+      employees: '150,000+',
+      rating: 4.5,
+      openJobs: 234,
+      description: 'Leading technology company focused on internet-related services and products.',
+      benefits: ['Health Insurance', 'Remote Work', 'Stock Options', 'Learning Budget']
     },
     {
       id: 2,
-      name: 'DataVision AI',
-      logo: 'https://placehold.co/80x80/8b5cf6/ffffff?text=DV',
-      industry: 'Artificial Intelligence',
-      location: 'New York, NY',
-      employees: '500-1,000',
-      rating: 4.9,
-      openJobs: 15,
-      description: 'Cutting-edge AI research company developing next-generation machine learning solutions.',
-      benefits: ['Flexible Hours', 'Learning Budget', 'Gym Membership', 'Catered Meals']
+      name: 'Microsoft',
+      logo: microsoftLogo,
+      industry: 'Technology',
+      location: 'Redmond, WA',
+      employees: '220,000+',
+      rating: 4.4,
+      openJobs: 189,
+      description: 'Global technology company developing software, hardware, and cloud services.',
+      benefits: ['401k Match', 'Parental Leave', 'Gym Membership', 'Professional Development']
     },
     {
       id: 3,
-      name: 'GreenTech Solutions',
-      logo: 'https://placehold.co/80x80/10b981/ffffff?text=GT',
-      industry: 'Clean Energy',
-      location: 'Austin, TX',
-      employees: '200-500',
-      rating: 4.7,
-      openJobs: 12,
-      description: 'Sustainable technology company focused on renewable energy and environmental solutions.',
-      benefits: ['4-Day Work Week', 'Unlimited PTO', 'Green Commute', 'Wellness Programs']
+      name: 'Amazon',
+      logo: amazonLogo,
+      industry: 'E-commerce & Cloud',
+      location: 'Seattle, WA',
+      employees: '1,500,000+',
+      rating: 4.3,
+      openJobs: 567,
+      description: "World's largest online retailer and leading cloud computing provider.",
+      benefits: ['Career Growth', 'Relocation Support', 'Employee Discounts', 'Tuition Assistance']
     },
     {
       id: 4,
-      name: 'CloudFlow Systems',
-      logo: 'https://placehold.co/80x80/f59e0b/ffffff?text=CF',
-      industry: 'Cloud Computing',
-      location: 'Seattle, WA',
-      employees: '1,000-5,000',
-      rating: 4.6,
-      openJobs: 31,
-      description: 'Enterprise cloud infrastructure provider serving Fortune 500 companies worldwide.',
-      benefits: ['Remote First', 'Sabbatical Leave', 'Professional Development', 'Mental Health Support']
+      name: 'Meta',
+      logo: metaLogo,
+      industry: 'Social Media',
+      location: 'Menlo Park, CA',
+      employees: '86,000+',
+      rating: 4.2,
+      openJobs: 145,
+      description: 'Social technology company building the future of human connection.',
+      benefits: ['Generous PTO', 'Wellness Programs', 'Innovation Time', 'Global Mobility']
     },
     {
       id: 5,
-      name: 'HealthTech Innovations',
-      logo: 'https://placehold.co/80x80/ef4444/ffffff?text=HT',
-      industry: 'Healthcare Technology',
-      location: 'Boston, MA',
-      employees: '500-1,000',
-      rating: 4.8,
-      openJobs: 18,
-      description: 'Digital health platform improving patient care through innovative medical technology.',
-      benefits: ['Health Stipend', 'Parental Leave', 'Conference Budget', 'Volunteer Time Off']
+      name: 'Apple',
+      logo: appleLogo,
+      industry: 'Technology',
+      location: 'Cupertino, CA',
+      employees: '164,000+',
+      rating: 4.5,
+      openJobs: 178,
+      description: 'Innovative technology company creating groundbreaking products and services.',
+      benefits: ['Product Discounts', 'Health & Wellness', 'Commuter Benefits', 'Educational Support']
     },
     {
       id: 6,
-      name: 'EdTech Future',
-      logo: 'https://placehold.co/80x80/06b6d4/ffffff?text=EF',
-      industry: 'Education Technology',
-      location: 'Remote',
-      employees: '50-200',
-      rating: 4.9,
-      openJobs: 8,
-      description: 'Online learning platform transforming education with personalized AI-driven curricula.',
-      benefits: ['Fully Remote', 'Learning Stipend', 'Equipment Budget', 'Team Retreats']
+      name: 'Netflix',
+      logo: netflixLogo,
+      industry: 'Entertainment',
+      location: 'Los Gatos, CA',
+      employees: '12,800+',
+      rating: 4.3,
+      openJobs: 67,
+      description: 'Global streaming entertainment service with original content production.',
+      benefits: ['Unlimited PTO', 'Freedom & Responsibility', 'Competitive Salary', 'Content Access']
     }
   ];
 
