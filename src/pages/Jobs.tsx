@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, MapPin, DollarSign, Clock, Building2, Filter, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Search, MapPin, DollarSign, Clock, Building2, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -8,23 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 
 type Job = Tables<'jobs'>;
 
 const Jobs = () => {
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Read URL parameters and set initial state
@@ -37,10 +32,7 @@ const Jobs = () => {
     if (types) setSelectedTypes(types.split(','));
     
     fetchJobs();
-    if (user) {
-      fetchSavedJobs();
-    }
-  }, [user]);
+  }, []);
 
   const fetchJobs = async () => {
     try {
@@ -55,76 +47,6 @@ const Jobs = () => {
       console.error('Error fetching jobs:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSavedJobs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('saved_jobs')
-        .select('job_id')
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
-      setSavedJobIds(new Set(data?.map(item => item.job_id) || []));
-    } catch (error) {
-      console.error('Error fetching saved jobs:', error);
-    }
-  };
-
-  const toggleSaveJob = async (jobId: string) => {
-    if (!user) {
-      toast({
-        title: "Login required",
-        description: "Please login to save jobs",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const isSaved = savedJobIds.has(jobId);
-
-    try {
-      if (isSaved) {
-        const { error } = await supabase
-          .from('saved_jobs')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('job_id', jobId);
-
-        if (error) throw error;
-
-        setSavedJobIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(jobId);
-          return newSet;
-        });
-
-        toast({
-          title: "Job removed",
-          description: "Job removed from saved list",
-        });
-      } else {
-        const { error } = await supabase
-          .from('saved_jobs')
-          .insert({ user_id: user.id, job_id: jobId });
-
-        if (error) throw error;
-
-        setSavedJobIds(prev => new Set([...prev, jobId]));
-
-        toast({
-          title: "Job saved",
-          description: "Job saved for later",
-        });
-      }
-    } catch (error) {
-      console.error('Error toggling saved job:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save job",
-        variant: "destructive",
-      });
     }
   };
 
@@ -262,33 +184,16 @@ const Jobs = () => {
               <Card key={job.id} className="jobbly-card hover:scale-105 transition-transform">
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                    <div>
                       <h3 className="font-bold text-lg mb-1">{job.title}</h3>
                       <div className="flex items-center text-muted-foreground mb-2">
                         <Building2 className="w-4 h-4 mr-1" />
                         <span>{job.company}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          toggleSaveJob(job.id);
-                        }}
-                        className="h-8 w-8"
-                      >
-                        {savedJobIds.has(job.id) ? (
-                          <BookmarkCheck className="h-5 w-5 text-primary" />
-                        ) : (
-                          <Bookmark className="h-5 w-5" />
-                        )}
-                      </Button>
-                      <Badge variant="secondary" className="text-xs">
-                        {job.type?.replace('-', ' ').toUpperCase() || 'FULL TIME'}
-                      </Badge>
-                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {job.type?.replace('-', ' ').toUpperCase() || 'FULL TIME'}
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">

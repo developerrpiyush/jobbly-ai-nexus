@@ -63,11 +63,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: `${window.location.origin}/`,
-        // Disable email confirmation for job seekers, keep it for employers
-        ...(role === 'job_seeker' && {
-          emailRedirectTo: undefined,
-        }),
       },
     });
 
