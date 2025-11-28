@@ -99,16 +99,6 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* CTA Button */}
-        <div className="flex justify-center mb-12">
-          <Button 
-            className="jobbly-btn-primary px-12 py-4 text-lg font-semibold" 
-            onClick={() => navigate('/login')}
-          >
-            Login / Sign Up
-          </Button>
-        </div>
-
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
           <div className="text-center">

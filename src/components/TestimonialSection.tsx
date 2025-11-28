@@ -4,28 +4,28 @@ const TestimonialSection = () => {
   const testimonials = [
     {
       id: 1,
-      name: 'Sarah Chen',
+      name: 'Priya Sharma',
       role: 'Software Engineer',
       company: 'Meta',
-      avatar: 'https://placehold.co/80x80/8b5cf6/ffffff?text=SC',
+      avatar: 'https://placehold.co/80x80/8b5cf6/ffffff?text=PS',
       rating: 5,
       text: "Jobbly's AI matching is incredible! I found my dream job at Meta within just 2 weeks. The platform understood exactly what I was looking for and connected me with the perfect opportunity."
     },
     {
       id: 2,
-      name: 'Marcus Johnson',
+      name: 'Rahul Verma',
       role: 'Product Manager',
       company: 'Google',
-      avatar: 'https://placehold.co/80x80/10b981/ffffff?text=MJ',
+      avatar: 'https://placehold.co/80x80/10b981/ffffff?text=RV',
       rating: 5,
       text: "The interview prep tools and AI coaching helped me nail my Google interview. Jobbly doesn't just find you jobs, it prepares you to succeed in them."
     },
     {
       id: 3,
-      name: 'Elena Rodriguez',
+      name: 'Anjali Patel',
       role: 'Data Scientist',
       company: 'Netflix',
-      avatar: 'https://placehold.co/80x80/ef4444/ffffff?text=ER',
+      avatar: 'https://placehold.co/80x80/ef4444/ffffff?text=AP',
       rating: 5,
       text: "As someone changing careers, Jobbly's skill assessment and personalized learning paths were game-changers. I transitioned from finance to tech seamlessly."
     }
@@ -93,11 +93,11 @@ const TestimonialSection = () => {
               <div className="text-muted-foreground">Average Time to Hire</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-gradient-purple mb-2">$15k</div>
+              <div className="text-4xl font-bold text-gradient-purple mb-2">₹1.2L</div>
               <div className="text-muted-foreground">Average Salary Increase</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-gradient-purple mb-2">500k+</div>
+              <div className="text-4xl font-bold text-gradient-purple mb-2">5L+</div>
               <div className="text-muted-foreground">Happy Job Seekers</div>
             </div>
           </div>
