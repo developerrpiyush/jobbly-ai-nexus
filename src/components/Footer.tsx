@@ -4,7 +4,6 @@ import {
   Linkedin, 
   Instagram, 
   Mail, 
-  Phone, 
   MapPin 
 } from 'lucide-react';
 import { useState } from 'react';
@@ -168,15 +167,11 @@ const Footer = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex items-center text-muted-foreground">
                   <Mail size={16} className="mr-3" />
-                  <span>hello@jobbly.com</span>
-                </div>
-                <div className="flex items-center text-muted-foreground">
-                  <Phone size={16} className="mr-3" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>contact@jobbly.in</span>
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <MapPin size={16} className="mr-3" />
-                  <span>San Francisco, CA</span>
+                  <span>Pune, India</span>
                 </div>
               </div>
 

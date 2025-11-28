@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import FeaturesSection from '@/components/FeaturesSection';
-import JobsSection from '@/components/JobsSection';
 import CompaniesSection from '@/components/CompaniesSection';
 import TestimonialSection from '@/components/TestimonialSection';
 import Footer from '@/components/Footer';
@@ -81,9 +80,6 @@ const Index = () => {
         
         <div className="section-separator" />
         <FeaturesSection />
-        
-        <div className="section-separator" />
-        <JobsSection />
         
         <div className="section-separator" />
         <CompaniesSection />
